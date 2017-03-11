@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -48,14 +49,28 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView3" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:id="@+id/editText_commandsleeptime" />
+        <EditText
+            android:id="@+id/editText_commandsleeptime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number" />
 
-    <Button
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Touchscreen Mount" />
+
+        <EditText
+            android:id="@+id/editText_touchmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            tools:text="/dev/input/event0" />
+
+        <Button
         android:text="Start Bot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,7 +84,8 @@
         android:id="@+id/button_closeImageView" />
 
     <ImageView
+        android:id="@+id/imageView_taparea"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/imageView_taparea" />
+        android:adjustViewBounds="true" />
 </RelativeLayout>

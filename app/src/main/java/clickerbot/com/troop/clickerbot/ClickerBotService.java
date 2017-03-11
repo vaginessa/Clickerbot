@@ -61,7 +61,7 @@ public class ClickerBotService extends Service
 
     @Override public void onCreate() {
         super.onCreate();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         workerCount = preferences.getInt(ClickerBotActivity.PREFERENCES_WORKERCOUNT,15);
         sleepTimeBetweenWorker = preferences.getInt(ClickerBotActivity.PREFERENCES_SLEEPTIME_BETWEEN_WORKERS,20);
         sleepTimeBetweenWorker = preferences.getInt(ClickerBotActivity.PREFERENCES_CMDSLEEP,10);
@@ -113,7 +113,7 @@ public class ClickerBotService extends Service
 
         params.gravity = Gravity.TOP|Gravity.LEFT;
         params.x = (metrics.widthPixels/2) - (iconsize + 5);
-        params.y = 0;
+        params.y = 10;
 
         windowManager.addView(startStopButton, params);
 
@@ -161,7 +161,7 @@ public class ClickerBotService extends Service
             public void run() {
                 int to =0;
                 for (int i = 0; i< workerCount; i++){
-                    rootShells.add(new RootShell(i,cmdsleep,touchePoints[to].x,touchePoints[to].y));
+                    rootShells.add(new RootShell(i,cmdsleep,touchePoints[to].x,touchePoints[to].y, preferences.getString(ClickerBotActivity.PREFERENCES_TOUCHMOUNT,"/dev/input/event0")));
                     to++;
                     if (to == touchePoints.length)
                         to = 0;

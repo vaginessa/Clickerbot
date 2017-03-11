@@ -17,18 +17,22 @@ public class RootShell
     private int id;
     private String cmdDown;
     private String cmdUp;
+    private String synevent;
     private int cmdsleep;
 
 
-    public RootShell(int id, int cmdsleep, int x, int y)
+    public RootShell(int id, int cmdsleep, int x, int y, String inputmount)
     {
+        CmdBuilder builder = new CmdBuilder(inputmount);
         this.id =id;
         this.cmdsleep = cmdsleep;
+        Log.d(TAG, "set touch to: " + x+"/"+y);
         //if ((id % 2) == 0 )
-            cmdDown = CmdBuilder.getTouchDown(x,y,id);
+            cmdDown = builder.getTouchDown(x,y,id);
         //else
         //   cmdDown = CmdBuilder.getTouchDown(x,y-200,id);
-        cmdUp = CmdBuilder.getTouchUp();
+        cmdUp = builder.getTouchUp();
+        synevent = builder.getSynEvent();
         try {
             process = Runtime.getRuntime().exec("su");
             os = new DataOutputStream(process.getOutputStream());
@@ -57,8 +61,12 @@ public class RootShell
     private void sendTouchDownUp() throws IOException, InterruptedException {
         os.writeChars(cmdDown);
         os.flush();
+        os.writeChars(synevent);
+        os.flush();
         Thread.sleep(cmdsleep);
         os.writeChars(cmdUp);
+        os.flush();
+        os.writeChars(synevent);
         os.flush();
     }
 

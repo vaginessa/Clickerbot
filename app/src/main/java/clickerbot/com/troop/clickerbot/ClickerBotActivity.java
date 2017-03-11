@@ -13,6 +13,8 @@ import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,9 +38,11 @@ public class ClickerBotActivity extends Activity {
     public static String PREFERENCES_CMDSLEEP = "cmdsleep";
     public static String PREFERENCES_TAPX = "tapx";
     public static String PREFERENCES_TAPY = "tapy";
+    public static String PREFERENCES_TOUCHMOUNT = "touchmount";
     public final static int REQUEST_CODE = -1010101;
     private EditText workercount;
     private EditText sleeptimebetweenworker;
+    private EditText touchmount;
     private Button startbot;
     private SharedPreferences preferences;
     private EditText cmdsleeptime;
@@ -46,6 +50,8 @@ public class ClickerBotActivity extends Activity {
     private ImageView taparea;
     private ArrayList<String> touchAreas;
     private Button closeImageViewButton;
+
+    private final String TAG = ClickerBotActivity.class.getSimpleName();
 
     private final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -63,7 +69,7 @@ public class ClickerBotActivity extends Activity {
         preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         sleeptimebetweenworker = (EditText) findViewById(R.id.editText_sleeptimebetweenworkers);
-        int t= preferences.getInt(PREFERENCES_SLEEPTIME_BETWEEN_WORKERS, 20);
+        int t= preferences.getInt(PREFERENCES_SLEEPTIME_BETWEEN_WORKERS, 1);
         sleeptimebetweenworker.setText(t +"");
         sleeptimebetweenworker.addTextChangedListener(new TextWatcher() {
             @Override
@@ -87,7 +93,7 @@ public class ClickerBotActivity extends Activity {
             }
         });
         workercount = (EditText) findViewById(R.id.editText_worker);
-        workercount.setText(preferences.getInt(PREFERENCES_WORKERCOUNT, 15)+"");
+        workercount.setText(preferences.getInt(PREFERENCES_WORKERCOUNT, 10)+"");
         workercount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -111,7 +117,7 @@ public class ClickerBotActivity extends Activity {
 
 
         cmdsleeptime = (EditText) findViewById(R.id.editText_commandsleeptime);
-        cmdsleeptime.setText(preferences.getInt(PREFERENCES_CMDSLEEP, 10)+"");
+        cmdsleeptime.setText(preferences.getInt(PREFERENCES_CMDSLEEP, 60)+"");
         cmdsleeptime.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -125,6 +131,26 @@ public class ClickerBotActivity extends Activity {
                 if (!tmp.equals(""))
                     t = Integer.parseInt(tmp);
                 preferences.edit().putInt(PREFERENCES_CMDSLEEP,t).commit();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        touchmount = (EditText) findViewById(R.id.editText_touchmount);
+        touchmount.setText(preferences.getString(PREFERENCES_TOUCHMOUNT,"/dev/input/event0"));
+        touchmount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String tmp = touchmount.getText().toString();
+                preferences.edit().putString(PREFERENCES_TOUCHMOUNT,tmp).commit();
             }
 
             @Override
@@ -150,6 +176,7 @@ public class ClickerBotActivity extends Activity {
                 taparea.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.taptitans));
                 taparea.setVisibility(View.VISIBLE);
                 closeImageViewButton.setVisibility(View.VISIBLE);
+                closeImageViewButton.bringToFront();
             }
         });
 
@@ -169,6 +196,10 @@ public class ClickerBotActivity extends Activity {
         });
         closeImageViewButton.setVisibility(View.GONE);
 
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Log.d(TAG, "display width: " +metrics.widthPixels + " height:"+metrics.heightPixels);
+
         taparea = (ImageView)findViewById(R.id.imageView_taparea);
         taparea.setVisibility(View.GONE);
         taparea.setOnTouchListener(new View.OnTouchListener() {
@@ -179,7 +210,9 @@ public class ClickerBotActivity extends Activity {
                 {
                     case MotionEvent.ACTION_UP:
                     {
-                        touchAreas.add((int)event.getX()+","+(int)event.getY());
+                        Log.d(TAG,"Image Width:" + taparea.getWidth() + " Height:" +taparea.getHeight());
+                        Log.d(TAG, "X: " + (int)event.getRawX() + " Y: " +(int)event.getRawY());
+                        touchAreas.add((int)(event.getRawX())+","+(int)event.getRawY());
                     }
                 }
                 return true;
